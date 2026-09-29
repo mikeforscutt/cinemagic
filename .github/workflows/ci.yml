@@ -13,7 +13,7 @@ jobs:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_DB: cinema_test
+          POSTGRES_DB: cinemagic_test
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
         ports: ['5432:5432']
@@ -53,8 +53,11 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
+      - name: Lint and format check
+        run: npm run check
+
       - name: Type check
-        run: npm run types
+        run: npm run types:check
 
       - name: Build assets
         run: npm run build
@@ -64,7 +67,7 @@ jobs:
           DB_CONNECTION: pgsql
           DB_HOST: localhost
           DB_PORT: 5432
-          DB_DATABASE: cinema_test
+          DB_DATABASE: cinemagic_test
           DB_USERNAME: postgres
           DB_PASSWORD: password
         run: php artisan test
