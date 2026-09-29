@@ -53,6 +53,9 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
+      - name: Generate Wayfinder types
+        run: php artisan wayfinder:generate
+
       - name: Lint and format check
         run: npm run check
 
