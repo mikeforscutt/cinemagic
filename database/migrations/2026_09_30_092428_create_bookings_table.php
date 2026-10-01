@@ -13,7 +13,16 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('screening_id')->constrained()->cascadeOnDelete();
+            $table->string('reference', 12)->unique();
+            $table->string('status');
+            $table->unsignedInteger('total_pence');
+            $table->timestampTz('held_until')->nullable();
+            $table->timestampTz('confirmed_at')->nullable();
             $table->timestamps();
+
+            $table->index(['status', 'held_until']);
         });
     }
 

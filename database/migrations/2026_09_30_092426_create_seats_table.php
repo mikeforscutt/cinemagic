@@ -13,7 +13,15 @@ return new class extends Migration
     {
         Schema::create('seats', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('screen_id')->constrained()->cascadeOnDelete();
+            $table->string('row_label', 2);
+            $table->unsignedSmallInteger('seat_number');
+            $table->string('type')->default('standard');
+            $table->unsignedSmallInteger('position_x');
+            $table->unsignedSmallInteger('position_y');
             $table->timestamps();
+
+            $table->unique(['screen_id', 'row_label', 'seat_number']);
         });
     }
 
