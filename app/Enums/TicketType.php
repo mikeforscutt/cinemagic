@@ -9,7 +9,9 @@ enum TicketType: string
     case Student = 'student';
     case Senior = 'senior';
 
-    /** Multiplier applied to a screening's base price. */
+    /**
+     * Multiplier applied to a screening's base price.
+     */
     public function multiplier(): float
     {
         return match ($this) {
