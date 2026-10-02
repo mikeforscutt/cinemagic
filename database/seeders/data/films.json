@@ -1,112 +1,112 @@
 [
-  {
-    "title": "The Lighthouse Keeper's Daughter",
-    "synopsis": "When a storm cuts her island off from the mainland, a young woman discovers her father has been keeping more than the light burning. A slow-building drama about inheritance, duty and the stories families tell to survive.",
-    "runtime_minutes": 118,
-    "certificate": "12A",
-    "release_date": "2026-03-14",
-    "director": "Niamh Corrigan",
-    "genres": ["Drama", "Thriller"],
-    "cast_list": ["Rosa Mellor", "David Achebe", "Ingrid Solheim"],
-    "poster_path": null
-  },
-  {
-    "title": "Carbon Tuesday",
-    "synopsis": "A climate negotiator with nothing left to lose locks forty delegates in a room and refuses to let anyone leave until they sign. Tense, talky, and far funnier than it has any right to be.",
-    "runtime_minutes": 134,
-    "certificate": "15",
-    "release_date": "2026-05-02",
-    "director": "Marcus Oyelaran",
-    "genres": ["Drama", "Thriller"],
-    "cast_list": ["Jonah Pryce", "Clementine Bask", "Theo Nakamura"],
-    "poster_path": null
-  },
-  {
-    "title": "Mothlight",
-    "synopsis": "Something is drawing the village children into the woods at night, and only the new schoolteacher seems to notice. Folk horror with patience and a genuinely upsetting final twenty minutes.",
-    "runtime_minutes": 102,
-    "certificate": "18",
-    "release_date": "2026-01-23",
-    "director": "Ava Lindqvist",
-    "genres": ["Horror", "Thriller"],
-    "cast_list": ["Elena Fitzgerald", "Samuel Okonkwo", "Marta Rievsky"],
-    "poster_path": null
-  },
-  {
-    "title": "Six Weeks in Margate",
-    "synopsis": "Two strangers agree to fake a relationship for one summer to satisfy their respective families. Warm, scruffy and sharply written, with a terrible karaoke scene that redeems itself.",
-    "runtime_minutes": 96,
-    "certificate": "12A",
-    "release_date": "2026-06-11",
-    "director": "Priya Raghunathan",
-    "genres": ["Romance", "Comedy"],
-    "cast_list": ["Daniel Osei", "Lucy Haverford", "Big Pete Doherty"],
-    "poster_path": null
-  },
-  {
-    "title": "The Cartographer's Error",
-    "synopsis": "A mapmaker's deliberate mistake, planted in 1890 to catch plagiarists, turns out to describe a real place. Part detective story, part slow unravelling of a family that profited from the lie.",
-    "runtime_minutes": 127,
-    "certificate": "15",
-    "release_date": "2026-02-27",
-    "director": "Henrik Vasquez",
-    "genres": ["Drama", "Thriller"],
-    "cast_list": ["Odile Barthes", "James Wrenfield", "Nkechi Adeyemi"],
-    "poster_path": null
-  },
-  {
-    "title": "Orbital Decay",
-    "synopsis": "The last two technicians on a decommissioned station have nine days of air and one working escape pod. Hard science fiction that trusts its audience to do the arithmetic.",
-    "runtime_minutes": 141,
-    "certificate": "12A",
-    "release_date": "2026-04-18",
-    "director": "Sunwoo Park",
-    "genres": ["Sci-Fi", "Drama"],
-    "cast_list": ["Reza Mahdavi", "Astrid Kowalczyk", "Tomas Lindgren"],
-    "poster_path": null
-  },
-  {
-    "title": "Pennywhistle",
-    "synopsis": "An animated adventure about a mouse who can only play one note, and the orchestra that needs exactly that note. Gorgeous hand-drawn work and a score worth the ticket alone.",
-    "runtime_minutes": 88,
-    "certificate": "U",
-    "release_date": "2026-07-04",
-    "director": "Beatrix Oyelowo",
-    "genres": ["Animation", "Comedy"],
-    "cast_list": ["Freya Ambrose", "Nigel Partington", "Kit Sandoval"],
-    "poster_path": null
-  },
-  {
-    "title": "The Quiet Part",
-    "synopsis": "A radio host who has spent thirty years listening to other people's confessions finally has one of her own. Builds slowly to a single unbroken twelve-minute take.",
-    "runtime_minutes": 109,
-    "certificate": "15",
-    "release_date": "2026-05-29",
-    "director": "Callum Fraser",
-    "genres": ["Drama"],
-    "cast_list": ["Maureen Blythe", "Anton Petrov", "Sadie Oyinlola"],
-    "poster_path": null
-  },
-  {
-    "title": "Hollow Point Road",
-    "synopsis": "A getaway driver takes one last job and discovers the cargo is a witness she is supposed to deliver to the wrong people. Lean, fast and mercifully free of sequel setup.",
-    "runtime_minutes": 112,
-    "certificate": "15",
-    "release_date": "2026-08-08",
-    "director": "Yusuf Demirci",
-    "genres": ["Action", "Thriller"],
-    "cast_list": ["Rae Jackson", "Milo Castellanos", "Hana Watanabe"],
-    "poster_path": null
-  },
-  {
-    "title": "Every Other Weekend",
-    "synopsis": "A father and his eleven-year-old daughter navigate two years of alternating weekends, told entirely through the car journeys between houses. Quietly devastating and often very funny.",
-    "runtime_minutes": 104,
-    "certificate": "12A",
-    "release_date": "2026-09-12",
-    "director": "Grace Ulyanova",
-    "genres": ["Drama", "Comedy"],
-    "cast_list": ["Peter Nyman", "Immy Carrick-Doyle", "Laura Benitez"],
-    "poster_path": null
-  }
+    {
+        "title": "The Lighthouse Keeper's Daughter",
+        "synopsis": "When a storm cuts her island off from the mainland, a young woman discovers her father has been keeping more than the light burning. A slow-building drama about inheritance, duty and the stories families tell to survive.",
+        "runtime_minutes": 118,
+        "certificate": "12A",
+        "release_date": "2026-03-14",
+        "director": "Niamh Corrigan",
+        "genres": ["Drama", "Thriller"],
+        "cast_list": ["Rosa Mellor", "David Achebe", "Ingrid Solheim"],
+        "poster_path": null
+    },
+    {
+        "title": "Carbon Tuesday",
+        "synopsis": "A climate negotiator with nothing left to lose locks forty delegates in a room and refuses to let anyone leave until they sign. Tense, talky, and far funnier than it has any right to be.",
+        "runtime_minutes": 134,
+        "certificate": "15",
+        "release_date": "2026-05-02",
+        "director": "Marcus Oyelaran",
+        "genres": ["Drama", "Thriller"],
+        "cast_list": ["Jonah Pryce", "Clementine Bask", "Theo Nakamura"],
+        "poster_path": null
+    },
+    {
+        "title": "Mothlight",
+        "synopsis": "Something is drawing the village children into the woods at night, and only the new schoolteacher seems to notice. Folk horror with patience and a genuinely upsetting final twenty minutes.",
+        "runtime_minutes": 102,
+        "certificate": "18",
+        "release_date": "2026-01-23",
+        "director": "Ava Lindqvist",
+        "genres": ["Horror", "Thriller"],
+        "cast_list": ["Elena Fitzgerald", "Samuel Okonkwo", "Marta Rievsky"],
+        "poster_path": null
+    },
+    {
+        "title": "Six Weeks in Margate",
+        "synopsis": "Two strangers agree to fake a relationship for one summer to satisfy their respective families. Warm, scruffy and sharply written, with a terrible karaoke scene that redeems itself.",
+        "runtime_minutes": 96,
+        "certificate": "12A",
+        "release_date": "2026-06-11",
+        "director": "Priya Raghunathan",
+        "genres": ["Romance", "Comedy"],
+        "cast_list": ["Daniel Osei", "Lucy Haverford", "Big Pete Doherty"],
+        "poster_path": null
+    },
+    {
+        "title": "The Cartographer's Error",
+        "synopsis": "A mapmaker's deliberate mistake, planted in 1890 to catch plagiarists, turns out to describe a real place. Part detective story, part slow unravelling of a family that profited from the lie.",
+        "runtime_minutes": 127,
+        "certificate": "15",
+        "release_date": "2026-02-27",
+        "director": "Henrik Vasquez",
+        "genres": ["Drama", "Thriller"],
+        "cast_list": ["Odile Barthes", "James Wrenfield", "Nkechi Adeyemi"],
+        "poster_path": null
+    },
+    {
+        "title": "Orbital Decay",
+        "synopsis": "The last two technicians on a decommissioned station have nine days of air and one working escape pod. Hard science fiction that trusts its audience to do the arithmetic.",
+        "runtime_minutes": 141,
+        "certificate": "12A",
+        "release_date": "2026-04-18",
+        "director": "Sunwoo Park",
+        "genres": ["Sci-Fi", "Drama"],
+        "cast_list": ["Reza Mahdavi", "Astrid Kowalczyk", "Tomas Lindgren"],
+        "poster_path": null
+    },
+    {
+        "title": "Pennywhistle",
+        "synopsis": "An animated adventure about a mouse who can only play one note, and the orchestra that needs exactly that note. Gorgeous hand-drawn work and a score worth the ticket alone.",
+        "runtime_minutes": 88,
+        "certificate": "U",
+        "release_date": "2026-07-04",
+        "director": "Beatrix Oyelowo",
+        "genres": ["Animation", "Comedy"],
+        "cast_list": ["Freya Ambrose", "Nigel Partington", "Kit Sandoval"],
+        "poster_path": null
+    },
+    {
+        "title": "The Quiet Part",
+        "synopsis": "A radio host who has spent thirty years listening to other people's confessions finally has one of her own. Builds slowly to a single unbroken twelve-minute take.",
+        "runtime_minutes": 109,
+        "certificate": "15",
+        "release_date": "2026-05-29",
+        "director": "Callum Fraser",
+        "genres": ["Drama"],
+        "cast_list": ["Maureen Blythe", "Anton Petrov", "Sadie Oyinlola"],
+        "poster_path": null
+    },
+    {
+        "title": "Hollow Point Road",
+        "synopsis": "A getaway driver takes one last job and discovers the cargo is a witness she is supposed to deliver to the wrong people. Lean, fast and mercifully free of sequel setup.",
+        "runtime_minutes": 112,
+        "certificate": "15",
+        "release_date": "2026-08-08",
+        "director": "Yusuf Demirci",
+        "genres": ["Action", "Thriller"],
+        "cast_list": ["Rae Jackson", "Milo Castellanos", "Hana Watanabe"],
+        "poster_path": null
+    },
+    {
+        "title": "Every Other Weekend",
+        "synopsis": "A father and his eleven-year-old daughter navigate two years of alternating weekends, told entirely through the car journeys between houses. Quietly devastating and often very funny.",
+        "runtime_minutes": 104,
+        "certificate": "12A",
+        "release_date": "2026-09-12",
+        "director": "Grace Ulyanova",
+        "genres": ["Drama", "Comedy"],
+        "cast_list": ["Peter Nyman", "Immy Carrick-Doyle", "Laura Benitez"],
+        "poster_path": null
+    }
 ]
