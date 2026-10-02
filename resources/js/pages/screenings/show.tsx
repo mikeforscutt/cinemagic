@@ -10,6 +10,7 @@ interface Seat {
     type: SeatType;
     position_x: number;
     position_y: number;
+    price_pence: number;
 }
 
 interface Screening {
@@ -36,14 +37,6 @@ interface Props {
 }
 
 const MAX_SEATS = 8;
-
-const PREMIUM_SURCHARGE_PENCE = 200;
-
-function priceFor(seat: Seat, basePence: number): number {
-    return seat.type === 'premium'
-        ? basePence + PREMIUM_SURCHARGE_PENCE
-        : basePence;
-}
 
 function formatPence(pence: number): string {
     return new Intl.NumberFormat('en-GB', {
@@ -87,7 +80,7 @@ export default function Show({ screening, seats, takenSeatIds }: Props) {
     );
 
     const total = selectedSeats.reduce(
-        (sum, seat) => sum + priceFor(seat, screening.base_price_pence),
+        (sum, seat) => sum + seat.price_pence,
         0,
     );
 
@@ -183,10 +176,7 @@ export default function Show({ screening, seats, takenSeatIds }: Props) {
                                                 isTaken
                                                     ? 'unavailable'
                                                     : formatPence(
-                                                          priceFor(
-                                                              seat,
-                                                              screening.base_price_pence,
-                                                          ),
+                                                          seat.price_pence,
                                                       )
                                             }`}
                                             title={`${seat.row_label}${seat.seat_number}`}
@@ -227,8 +217,7 @@ export default function Show({ screening, seats, takenSeatIds }: Props) {
                             </li>
                             <li className="flex items-center gap-2">
                                 <span className="h-3 w-3 rounded-sm bg-neutral-700" />{' '}
-                                Premium (+
-                                {formatPence(PREMIUM_SURCHARGE_PENCE)})
+                                Premium
                             </li>
                             <li className="flex items-center gap-2">
                                 <span className="h-3 w-3 rounded-sm bg-sky-900" />{' '}

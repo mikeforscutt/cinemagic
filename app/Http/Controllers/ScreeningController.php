@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Screening;
+use App\Models\Seat;
 use App\Services\SeatBookingService;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -52,8 +53,12 @@ class ScreeningController extends Controller
             'seats' => $screening->screen->seats()
                 ->orderBy('position_y')
                 ->orderBy('position_x')
-                ->get(['id', 'row_label', 'seat_number', 'type', 'position_x', 'position_y']),
-            'takenSeatIds' => $this->bookings->takenSeatIds($screening),
+                ->get(['id', 'row_label', 'seat_number', 'type', 'position_x', 'position_y'])
+                ->map(fn (Seat $seat) => [
+                    ...$seat->only(['id', 'row_label', 'seat_number', 'position_x', 'position_y']),
+                    'type' => $seat->type->value,
+                    'price_pence' => $screening->base_price_pence + $seat->type->surchargePence(),
+                ]),
         ]);
     }
 }
