@@ -31,7 +31,11 @@ const PALETTES = [
 ];
 
 function paletteFor(film: Film): [string, string] {
-    const seed = [...film.title].reduce((n, c) => n + c.charCodeAt(0), 0);
+    let seed = 0;
+
+    for (let i = 0; i < film.title.length; i++) {
+        seed += film.title.charCodeAt(i);
+    }
 
     return PALETTES[seed % PALETTES.length] as [string, string];
 }

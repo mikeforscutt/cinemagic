@@ -12,10 +12,17 @@ void createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
+            // Public and booking pages render their own header.
+            case name === 'welcome':
             case name.startsWith('screenings/'):
-                return null;
             case name.startsWith('bookings/'):
                 return null;
+            case name.startsWith('auth/'):
+                return AuthLayout;
+            case name.startsWith('settings/'):
+                return [AppLayout, SettingsLayout];
+            default:
+                return AppLayout;
         }
     },
     strictMode: true,
