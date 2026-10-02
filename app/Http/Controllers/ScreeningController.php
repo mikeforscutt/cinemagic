@@ -59,6 +59,8 @@ class ScreeningController extends Controller
                     'type' => $seat->type->value,
                     'price_pence' => $screening->base_price_pence + $seat->type->surchargePence(),
                 ]),
+            'takenSeatIds' => $this->bookings->takenSeatIds($screening),
         ]);
+
     }
 }

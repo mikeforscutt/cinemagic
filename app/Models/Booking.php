@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\BookingStatus;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -45,5 +46,14 @@ class Booking extends Model
             'confirmed_at' => 'immutable_datetime',
             'total_pence' => 'integer',
         ];
+    }
+
+    /**
+     * Send dates to the browser as ISO 8601 with an offset, so JavaScript
+     * parses them unambiguously rather than assuming local time.
+     */
+    protected function serializeDate(DateTimeInterface $date): string
+    {
+        return $date->toAtomString();
     }
 }
