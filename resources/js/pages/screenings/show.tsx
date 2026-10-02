@@ -110,6 +110,7 @@ export default function Show({ screening, seats, takenSeatIds }: Props) {
     function submit() {
         post(`/screenings/${screening.id}/hold`, {
             preserveScroll: true,
+            preserveState: false,
         });
     }
 

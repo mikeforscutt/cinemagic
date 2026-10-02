@@ -106,17 +106,25 @@ export default function Show({ booking }: Props) {
                 <header className="border-b border-white/5">
                     <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-5">
                         <Link
-                            href="/screenings"
+                            href="/"
                             className="text-lg font-semibold tracking-tight"
                         >
                             Cinemagic
                         </Link>
-                        <Link
-                            href="/bookings"
-                            className="text-sm text-neutral-400 transition-colors hover:text-neutral-100"
-                        >
-                            My bookings
-                        </Link>
+                        <nav className="flex items-center gap-6 text-sm text-neutral-400">
+                            <Link
+                                href="/screenings"
+                                className="transition-colors hover:text-neutral-100"
+                            >
+                                What&apos;s on
+                            </Link>
+                            <Link
+                                href="/bookings"
+                                className="transition-colors hover:text-neutral-100"
+                            >
+                                My bookings
+                            </Link>
+                        </nav>
                     </div>
                 </header>
 
@@ -246,15 +254,12 @@ export default function Show({ booking }: Props) {
                                     </button>
                                 )}
 
-                                {(booking.status === 'cancelled' ||
-                                    expired) && (
-                                    <Link
-                                        href={`/screenings/${booking.screening.id}`}
-                                        className="rounded-md bg-white/5 px-5 py-2.5 text-sm transition-colors hover:bg-white/10"
-                                    >
-                                        Choose seats again
-                                    </Link>
-                                )}
+                                <Link
+                                    href={`/screenings/${booking.screening.id}`}
+                                    className="rounded-md bg-white/5 px-5 py-2.5 text-sm transition-colors hover:bg-white/10"
+                                >
+                                    Back to seat map
+                                </Link>
                             </div>
                         </div>
                     </div>

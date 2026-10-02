@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Film extends Model
 {
@@ -28,6 +30,14 @@ class Film extends Model
         return $this->hasMany(Screening::class);
     }
 
+    /**
+     * Every booking made against any screening of this film.
+     */
+    public function bookings(): HasManyThrough
+    {
+        return $this->hasManyThrough(Booking::class, Screening::class);
+    }
+
     protected function casts(): array
     {
         return [
@@ -36,5 +46,14 @@ class Film extends Model
             'cast_list' => 'array',
             'runtime_minutes' => 'integer',
         ];
+    }
+
+    /**
+     * Send dates to the browser as ISO 8601 with an offset, so JavaScript
+     * parses them unambiguously rather than assuming local time.
+     */
+    protected function serializeDate(DateTimeInterface $date): string
+    {
+        return $date->toAtomString();
     }
 }
