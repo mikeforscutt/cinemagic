@@ -73,3 +73,13 @@ it('cannot double-book a seat at the database level', function () {
         'seat_id' => $this->seats[0]->id,
     ]);
 })->throws(QueryException::class);
+
+it('charges a surcharge for premium seats', function () {
+    $user = User::factory()->create();
+    $screening = Screening::factory()->create(['base_price_pence' => 800]);
+    $premium = Seat::factory()->premium()->for($screening->screen)->create();
+
+    $booking = app(SeatBookingService::class)->hold($screening, $user, [$premium->id]);
+
+    expect($booking->total_pence)->toBe(1000);
+});

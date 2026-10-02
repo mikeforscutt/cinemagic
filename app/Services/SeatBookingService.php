@@ -52,14 +52,16 @@ class SeatBookingService
                     throw SeatUnavailableException::taken();
                 }
 
-                $pricePence = $this->priceFor($screening, $ticketType);
+                $prices = $seats->mapWithKeys(
+                    fn (Seat $seat) => [$seat->id => $this->priceFor($screening, $seat, $ticketType)]
+                );
 
                 $booking = Booking::create([
                     'user_id' => $user->id,
                     'screening_id' => $screening->id,
                     'reference' => $this->generateReference(),
                     'status' => BookingStatus::Held,
-                    'total_pence' => $pricePence * $seats->count(),
+                    'total_pence' => $prices->sum(),
                     'held_until' => now()->addMinutes(self::HOLD_MINUTES),
                     'confirmed_at' => null,
                 ]);
@@ -70,7 +72,7 @@ class SeatBookingService
                         'screening_id' => $screening->id,
                         'seat_id' => $seat->id,
                         'ticket_type' => $ticketType,
-                        'price_pence' => $pricePence,
+                        'price_pence' => $prices[$seat->id],
                     ]);
                 }
 
@@ -199,9 +201,11 @@ class SeatBookingService
         return $seats;
     }
 
-    private function priceFor(Screening $screening, TicketType $ticketType): int
+    private function priceFor(Screening $screening, Seat $seat, TicketType $ticketType): int
     {
-        return (int) round($screening->base_price_pence * $ticketType->multiplier());
+        $base = $screening->base_price_pence + $seat->type->surchargePence();
+
+        return (int) round($base * $ticketType->multiplier());
     }
 
     private function generateReference(): string
