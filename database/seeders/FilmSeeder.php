@@ -23,8 +23,10 @@ class FilmSeeder extends Seeder
         $films = json_decode(file_get_contents($path), true, flags: JSON_THROW_ON_ERROR);
 
         foreach ($films as $film) {
+            $slug = Str::slug($film['title']);
+
             Film::updateOrCreate(
-                ['slug' => Str::slug($film['title'])],
+                ['slug' => $slug],
                 [
                     'title' => $film['title'],
                     'synopsis' => $film['synopsis'],
@@ -34,9 +36,26 @@ class FilmSeeder extends Seeder
                     'director' => $film['director'],
                     'genres' => $film['genres'],
                     'cast_list' => $film['cast_list'],
-                    'poster_path' => $film['poster_path'] ?? null,
+                    'poster_path' => $this->posterFor($slug),
                 ],
             );
         }
+    }
+
+    /**
+     * Posters live in public/posters, named by slug. Returns null when a
+     * film has no artwork, so the UI can fall back to a generated card.
+     */
+    private function posterFor(string $slug): ?string
+    {
+        foreach (['jpg', 'jpeg', 'png', 'webp'] as $extension) {
+            $relative = "/posters/{$slug}.{$extension}";
+
+            if (file_exists(public_path($relative))) {
+                return $relative;
+            }
+        }
+
+        return null;
     }
 }

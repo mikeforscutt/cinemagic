@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -44,5 +45,14 @@ class Screening extends Model
             'starts_at' => 'immutable_datetime',
             'base_price_pence' => 'integer',
         ];
+    }
+
+    /**
+     * Send dates to the browser as ISO 8601 with an offset, so JavaScript
+     * parses them unambiguously rather than assuming local time.
+     */
+    protected function serializeDate(DateTimeInterface $date): string
+    {
+        return $date->toAtomString();
     }
 }
