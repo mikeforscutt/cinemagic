@@ -125,7 +125,7 @@ export default function Index({ screenings }: Props) {
                 <header className="border-b border-white/5">
                     <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
                         <Link
-                            href="/screenings"
+                            href="/"
                             className="text-lg font-semibold tracking-tight"
                         >
                             Cinemagic
