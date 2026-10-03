@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { useMemo } from 'react';
 
 type SeatType = 'standard' | 'premium' | 'wheelchair';
@@ -121,8 +121,33 @@ export default function Show({ screening, seats, takenSeatIds }: Props) {
             />
 
             <div className="min-h-screen bg-neutral-950 text-neutral-100">
+                <header className="border-b border-white/5">
+                    <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
+                        <Link
+                            href="/"
+                            className="text-lg font-semibold tracking-tight"
+                        >
+                            Cinemagic
+                        </Link>
+                        <nav className="flex items-center gap-6 text-sm text-neutral-400">
+                            <Link
+                                href="/screenings"
+                                className="transition-colors hover:text-neutral-100"
+                            >
+                                What&apos;s on
+                            </Link>
+                            <Link
+                                href="/bookings"
+                                className="transition-colors hover:text-neutral-100"
+                            >
+                                My bookings
+                            </Link>
+                        </nav>
+                    </div>
+                </header>
+
                 <div className="mx-auto max-w-5xl px-6 py-12">
-                    <header className="mb-10">
+                    <div className="mb-10">
                         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
                             {screening.film.title}
                         </h1>
@@ -132,7 +157,7 @@ export default function Show({ screening, seats, takenSeatIds }: Props) {
                             {screening.film.certificate} ·{' '}
                             {screening.film.runtime_minutes} min
                         </p>
-                    </header>
+                    </div>
 
                     {errors.seat_ids && (
                         <div
