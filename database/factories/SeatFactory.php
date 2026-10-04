@@ -22,7 +22,7 @@ class SeatFactory extends Factory
         return [
             'screen_id' => Screen::factory(),
             'row_label' => fake()->randomLetter(),
-            'seat_number' => fake()->numberBetween(1, 20),
+            'seat_number' => fake()->unique()->numberBetween(1, 200),
             'type' => SeatType::Standard,
             'position_x' => fake()->numberBetween(0, 20),
             'position_y' => fake()->numberBetween(0, 10),
