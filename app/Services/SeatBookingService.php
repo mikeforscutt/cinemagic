@@ -1,0 +1,219 @@
+<?php
+
+namespace App\Services;
+
+use App\Enums\BookingStatus;
+use App\Enums\TicketType;
+use App\Exceptions\SeatUnavailableException;
+use App\Models\Booking;
+use App\Models\BookingSeat;
+use App\Models\Screening;
+use App\Models\Seat;
+use App\Models\User;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+class SeatBookingService
+{
+    /**
+     * How long a seat selection is held before it is released again.
+     */
+    public const HOLD_MINUTES = 10;
+
+    /**
+     * Place a temporary hold on the given seats for a screening.
+     *
+     * @param  array<int, int>  $seatIds
+     *
+     * @throws SeatUnavailableException
+     */
+    public function hold(Screening $screening, User $user, array $seatIds, TicketType $ticketType = TicketType::Adult): Booking
+    {
+        $seatIds = array_values(array_unique($seatIds));
+
+        try {
+            return DB::transaction(function () use ($screening, $user, $seatIds, $ticketType): Booking {
+                $this->releaseExpiredHolds($screening);
+
+                $seats = $this->validSeatsForScreening($screening, $seatIds);
+
+                // Lock any existing rows for these seats so concurrent holds queue
+                // rather than race. The unique index is what ultimately guarantees
+                // correctness; this just turns most races into a clean wait.
+                $taken = BookingSeat::query()
+                    ->where('screening_id', $screening->id)
+                    ->whereIn('seat_id', $seatIds)
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($taken) {
+                    throw SeatUnavailableException::taken();
+                }
+
+                $prices = $seats->mapWithKeys(
+                    fn (Seat $seat) => [$seat->id => $this->priceFor($screening, $seat, $ticketType)]
+                );
+
+                $booking = Booking::create([
+                    'user_id' => $user->id,
+                    'screening_id' => $screening->id,
+                    'reference' => $this->generateReference(),
+                    'status' => BookingStatus::Held,
+                    'total_pence' => $prices->sum(),
+                    'held_until' => now()->addMinutes(self::HOLD_MINUTES),
+                    'confirmed_at' => null,
+                ]);
+
+                foreach ($seats as $seat) {
+                    BookingSeat::create([
+                        'booking_id' => $booking->id,
+                        'screening_id' => $screening->id,
+                        'seat_id' => $seat->id,
+                        'ticket_type' => $ticketType,
+                        'price_pence' => $prices[$seat->id],
+                    ]);
+                }
+
+                return $booking->load('seats.seat');
+            });
+        } catch (QueryException $e) {
+            // 23505 is a unique violation: another request claimed a seat between
+            // our check and our insert. Surface it as a normal unavailable seat.
+            if ($e->getCode() === '23505') {
+                throw SeatUnavailableException::taken();
+            }
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Turn a held booking into a confirmed one.
+     *
+     * @throws SeatUnavailableException
+     */
+    public function confirm(Booking $booking): Booking
+    {
+        return DB::transaction(function () use ($booking): Booking {
+            $fresh = Booking::query()
+                ->whereKey($booking->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($fresh->status !== BookingStatus::Held) {
+                throw SeatUnavailableException::taken();
+            }
+
+            if ($fresh->held_until !== null && $fresh->held_until->isPast()) {
+                $this->cancel($fresh);
+
+                throw SeatUnavailableException::taken();
+            }
+
+            $fresh->update([
+                'status' => BookingStatus::Confirmed,
+                'held_until' => null,
+                'confirmed_at' => now(),
+            ]);
+
+            return $fresh->load('seats.seat');
+        });
+    }
+
+    /**
+     * Cancel a booking and free its seats.
+     *
+     * Seat rows are deleted rather than flagged, because the unique index on
+     * (screening_id, seat_id) would otherwise keep the seat occupied forever.
+     */
+    public function cancel(Booking $booking): Booking
+    {
+        return DB::transaction(function () use ($booking): Booking {
+            $booking->seats()->delete();
+
+            $booking->update([
+                'status' => BookingStatus::Cancelled,
+                'held_until' => null,
+            ]);
+
+            return $booking;
+        });
+    }
+
+    /**
+     * Release any holds on this screening that have lapsed.
+     */
+    public function releaseExpiredHolds(?Screening $screening = null): int
+    {
+        $query = Booking::query()
+            ->where('status', BookingStatus::Held)
+            ->whereNotNull('held_until')
+            ->where('held_until', '<', now());
+
+        if ($screening !== null) {
+            $query->where('screening_id', $screening->id);
+        }
+
+        $expired = $query->get();
+
+        foreach ($expired as $booking) {
+            $booking->seats()->delete();
+            $booking->update([
+                'status' => BookingStatus::Cancelled,
+                'held_until' => null,
+            ]);
+        }
+
+        return $expired->count();
+    }
+
+    /**
+     * The seats a screening currently has spoken for.
+     *
+     * @return Collection<int, int>
+     */
+    public function takenSeatIds(Screening $screening): Collection
+    {
+        return BookingSeat::query()
+            ->where('screening_id', $screening->id)
+            ->pluck('seat_id');
+    }
+
+    /**
+     * @param  array<int, int>  $seatIds
+     * @return Collection<int, Seat>
+     *
+     * @throws SeatUnavailableException
+     */
+    private function validSeatsForScreening(Screening $screening, array $seatIds): Collection
+    {
+        $seats = Seat::query()
+            ->whereIn('id', $seatIds)
+            ->where('screen_id', $screening->screen_id)
+            ->get();
+
+        if ($seats->count() !== count($seatIds)) {
+            throw SeatUnavailableException::notInScreen();
+        }
+
+        return $seats;
+    }
+
+    private function priceFor(Screening $screening, Seat $seat, TicketType $ticketType): int
+    {
+        $base = $screening->base_price_pence + $seat->type->surchargePence();
+
+        return (int) round($base * $ticketType->multiplier());
+    }
+
+    private function generateReference(): string
+    {
+        do {
+            $reference = 'CIN-'.Str::upper(Str::random(6));
+        } while (Booking::where('reference', $reference)->exists());
+
+        return $reference;
+    }
+}

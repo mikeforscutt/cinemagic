@@ -6,13 +6,16 @@ import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'Cinemagic';
 
 void createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
-            case name === 'welcome':
+            // Public and booking pages render their own header.
+            case name === 'home':
+            case name.startsWith('screenings/'):
+            case name.startsWith('bookings/'):
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
@@ -32,7 +35,7 @@ void createInertiaApp({
         );
     },
     progress: {
-        color: '#4B5563',
+        color: '#fbbf24',
     },
 });
 
