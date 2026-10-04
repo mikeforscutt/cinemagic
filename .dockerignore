@@ -11,3 +11,4 @@ storage/framework/sessions/*
 storage/framework/views/*
 tests
 bootstrap/cache/*.php
+database/*.sqlite
