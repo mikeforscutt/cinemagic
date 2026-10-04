@@ -4,7 +4,6 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\FilmController;
 use App\Http\Controllers\ScreeningController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', [FilmController::class, 'home'])->name('home');
 Route::get('/films/{film:slug}', [FilmController::class, 'show'])->name('films.show');
