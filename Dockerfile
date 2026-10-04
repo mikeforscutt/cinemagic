@@ -50,7 +50,11 @@ RUN cp .env.example .env \
 # ---------------------------------------------------------------------------
 FROM dunglas/frankenphp:php8.4-alpine
 
-RUN install-php-extensions pdo_pgsql bcmath opcache
+# The FrankenPHP binary ships with cap_net_bind_service set so it can bind
+# port 80 as a non-root user. Render's sandbox refuses to exec a file carrying
+# file capabilities, so strip them: the app binds $PORT, which is unprivileged.
+RUN install-php-extensions pdo_pgsql bcmath opcache \
+    && (setcap -r /usr/local/bin/frankenphp 2>/dev/null || true)
 
 WORKDIR /app
 
@@ -59,6 +63,7 @@ COPY --from=vendor /app/vendor ./vendor
 COPY --from=assets /app/public/build ./public/build
 
 RUN chown -R www-data:www-data storage bootstrap/cache
+RUN chmod -R 777 storage bootstrap/cache
 
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint
 RUN chmod +x /usr/local/bin/entrypoint
