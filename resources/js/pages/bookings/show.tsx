@@ -1,5 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import SiteHeader from '@/components/site-header';
 
 interface BookingSeat {
     id: number;
@@ -103,30 +104,7 @@ export default function Show({ booking }: Props) {
             <Head title={`Booking ${booking.reference}`} />
 
             <div className="min-h-screen bg-[#0a0a0b] text-neutral-100">
-                <header className="border-b border-white/5">
-                    <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-5">
-                        <Link
-                            href="/"
-                            className="text-lg font-semibold tracking-tight"
-                        >
-                            Cinemagic
-                        </Link>
-                        <nav className="flex items-center gap-6 text-sm text-neutral-400">
-                            <Link
-                                href="/screenings"
-                                className="transition-colors hover:text-neutral-100"
-                            >
-                                What&apos;s on
-                            </Link>
-                            <Link
-                                href="/bookings"
-                                className="transition-colors hover:text-neutral-100"
-                            >
-                                My bookings
-                            </Link>
-                        </nav>
-                    </div>
-                </header>
+                <SiteHeader maxWidth="max-w-3xl" />
 
                 <div className="mx-auto max-w-3xl px-6 py-12">
                     {booking.status === 'held' && !expired && (
