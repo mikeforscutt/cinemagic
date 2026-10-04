@@ -4,7 +4,6 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\FilmController;
 use App\Http\Controllers\ScreeningController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', [FilmController::class, 'home'])->name('home');
 Route::get('/films/{film:slug}', [FilmController::class, 'show'])->name('films.show');
@@ -13,9 +12,6 @@ Route::get('/screenings', [ScreeningController::class, 'index'])->name('screenin
 Route::get('/screenings/{screening}', [ScreeningController::class, 'show'])->name('screenings.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
 
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');

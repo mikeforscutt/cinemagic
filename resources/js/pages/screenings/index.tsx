@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
+import SiteHeader from '@/components/site-header';
 
 interface Film {
     id: number;
@@ -122,24 +123,7 @@ export default function Index({ screenings }: Props) {
             <Head title="What's on" />
 
             <div className="min-h-screen bg-[#0a0a0b] text-neutral-100">
-                <header className="border-b border-white/5">
-                    <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-                        <Link
-                            href="/"
-                            className="text-lg font-semibold tracking-tight"
-                        >
-                            Cinemagic
-                        </Link>
-                        <nav className="flex items-center gap-6 text-sm text-neutral-400">
-                            <Link
-                                href="/bookings"
-                                className="transition-colors hover:text-neutral-100"
-                            >
-                                My bookings
-                            </Link>
-                        </nav>
-                    </div>
-                </header>
+                <SiteHeader maxWidth="max-w-6xl" />
 
                 <div className="mx-auto max-w-6xl px-6 py-12">
                     <h1 className="text-4xl font-semibold tracking-tight">
