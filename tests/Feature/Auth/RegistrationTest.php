@@ -23,6 +23,9 @@ test('new users can register', function () {
         'password_confirmation' => 'password',
     ]);
 
+    $response->assertSessionHasNoErrors();
+    $response->assertStatus(302);
+
     $this->assertAuthenticated();
     $response->assertRedirect('/bookings');
 });

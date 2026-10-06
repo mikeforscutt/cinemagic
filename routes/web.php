@@ -11,7 +11,7 @@ Route::get('/films/{film:slug}', [FilmController::class, 'show'])->name('films.s
 Route::get('/screenings', [ScreeningController::class, 'index'])->name('screenings.index');
 Route::get('/screenings/{screening}', [ScreeningController::class, 'show'])->name('screenings.show');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
 
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
