@@ -63,10 +63,6 @@ class FortifyServiceProvider extends ServiceProvider
             'status' => $request->session()->get('status'),
         ]));
 
-        Fortify::verifyEmailView(fn (Request $request) => Inertia::render('auth/verify-email', [
-            'status' => $request->session()->get('status'),
-        ]));
-
         Fortify::registerView(fn () => Inertia::render('auth/register', [
             'passwordRules' => Password::defaults()->toPasswordRulesString(),
         ]));
@@ -83,10 +79,6 @@ class FortifyServiceProvider extends ServiceProvider
     {
         RateLimiter::for('two-factor', function (Request $request) {
             return Limit::perMinute(5)->by($request->session()->get('login.id'));
-        });
-
-        RateLimiter::for('register', function (Request $request) {
-            return Limit::perMinute(5)->by($request->ip());
         });
 
         RateLimiter::for('login', function (Request $request) {
