@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -56,5 +57,15 @@ class UserFactory extends Factory
             'two_factor_recovery_codes' => encrypt(json_encode(['recovery-code-1'])),
             'two_factor_confirmed_at' => now(),
         ]);
+    }
+
+    public function admin(): static
+    {
+        return $this->state(fn (): array => ['role' => UserRole::Admin]);
+    }
+
+    public function staff(): static
+    {
+        return $this->state(fn (): array => ['role' => UserRole::Staff]);
     }
 }
