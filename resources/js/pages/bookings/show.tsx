@@ -172,25 +172,24 @@ export default function Show({ booking }: Props) {
                             </p>
 
                             <dl className="mt-8 space-y-3 border-t border-white/5 pt-6 text-sm">
-                                <div className="flex justify-between gap-6">
-                                    <dt className="text-neutral-400">Seats</dt>
-                                    <dd className="text-right">
-                                        {booking.seats
-                                            .map(
-                                                (s) =>
-                                                    `${s.seat.row_label}${s.seat.seat_number}`,
-                                            )
-                                            .join(', ')}
-                                    </dd>
-                                </div>
-                                <div className="flex justify-between gap-6">
-                                    <dt className="text-neutral-400">
-                                        Tickets
-                                    </dt>
-                                    <dd className="text-right">
-                                        {booking.seats.length}
-                                    </dd>
-                                </div>
+                                {booking.seats.map((line) => (
+                                    <div
+                                        key={line.id}
+                                        className="flex justify-between gap-6"
+                                    >
+                                        <dt className="text-neutral-400">
+                                            {line.seat.row_label}
+                                            {line.seat.seat_number}
+                                            <span className="ml-2 text-neutral-600 capitalize">
+                                                {line.ticket_type}
+                                            </span>
+                                        </dt>
+                                        <dd className="tabular-nums">
+                                            {formatPence(line.price_pence)}
+                                        </dd>
+                                    </div>
+                                ))}
+
                                 <div className="flex justify-between gap-6 border-t border-white/5 pt-3">
                                     <dt className="font-medium">Total</dt>
                                     <dd className="font-semibold tabular-nums">

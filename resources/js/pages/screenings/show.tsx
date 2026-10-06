@@ -2,16 +2,22 @@ import { Head, useForm } from '@inertiajs/react';
 import { useMemo } from 'react';
 import SiteHeader from '@/components/site-header';
 
-type SeatType = 'standard' | 'premium' | 'wheelchair';
+type SeatTypeName = 'standard' | 'premium' | 'wheelchair';
 
 interface Seat {
     id: number;
     row_label: string;
     seat_number: number;
-    type: SeatType;
+    type: SeatTypeName;
     position_x: number;
     position_y: number;
     price_pence: number;
+}
+
+interface TicketType {
+    value: string;
+    label: string;
+    multiplier: number;
 }
 
 interface Screening {
@@ -35,9 +41,12 @@ interface Props {
     screening: Screening;
     seats: Seat[];
     takenSeatIds: number[];
+    ticketTypes: TicketType[];
 }
 
 const MAX_SEATS = 8;
+
+const DEFAULT_TICKET_TYPE = 'adult';
 
 function formatPence(pence: number): string {
     return new Intl.NumberFormat('en-GB', {
@@ -56,16 +65,33 @@ function formatStart(iso: string): string {
     });
 }
 
-export default function Show({ screening, seats, takenSeatIds }: Props) {
+export default function Show({
+    screening,
+    seats,
+    takenSeatIds,
+    ticketTypes,
+}: Props) {
     const { data, setData, post, processing, errors } = useForm<{
         seat_ids: number[];
+        ticket_types: Record<number, string>;
     }>({
         seat_ids: [],
+        ticket_types: {},
     });
 
     const selected = data.seat_ids;
 
     const taken = useMemo(() => new Set(takenSeatIds), [takenSeatIds]);
+
+    const multipliers = useMemo(() => {
+        const map = new Map<string, number>();
+
+        for (const type of ticketTypes) {
+            map.set(type.value, type.multiplier);
+        }
+
+        return map;
+    }, [ticketTypes]);
 
     const { columns, rows } = useMemo(
         () => ({
@@ -75,15 +101,32 @@ export default function Show({ screening, seats, takenSeatIds }: Props) {
         [seats],
     );
 
+    // Row labels down the left of the grid, one per distinct position_y.
+    const rowLabels = useMemo(() => {
+        const labels = new Map<number, string>();
+
+        for (const seat of seats) {
+            if (!labels.has(seat.position_y)) {
+                labels.set(seat.position_y, seat.row_label);
+            }
+        }
+
+        return labels;
+    }, [seats]);
+
     const selectedSeats = useMemo(
         () => seats.filter((seat) => selected.includes(seat.id)),
         [seats, selected],
     );
 
-    const total = selectedSeats.reduce(
-        (sum, seat) => sum + seat.price_pence,
-        0,
-    );
+    function priceFor(seat: Seat): number {
+        const type = data.ticket_types[seat.id] ?? DEFAULT_TICKET_TYPE;
+        const multiplier = multipliers.get(type) ?? 1;
+
+        return Math.round(seat.price_pence * multiplier);
+    }
+
+    const total = selectedSeats.reduce((sum, seat) => sum + priceFor(seat), 0);
 
     const atLimit = selected.length >= MAX_SEATS;
 
@@ -93,10 +136,13 @@ export default function Show({ screening, seats, takenSeatIds }: Props) {
         }
 
         if (selected.includes(seat.id)) {
-            setData(
-                'seat_ids',
-                selected.filter((id) => id !== seat.id),
-            );
+            const types = { ...data.ticket_types };
+            delete types[seat.id];
+
+            setData({
+                seat_ids: selected.filter((id) => id !== seat.id),
+                ticket_types: types,
+            });
 
             return;
         }
@@ -105,7 +151,20 @@ export default function Show({ screening, seats, takenSeatIds }: Props) {
             return;
         }
 
-        setData('seat_ids', [...selected, seat.id]);
+        setData({
+            seat_ids: [...selected, seat.id],
+            ticket_types: {
+                ...data.ticket_types,
+                [seat.id]: DEFAULT_TICKET_TYPE,
+            },
+        });
+    }
+
+    function setTicketType(seatId: number, value: string) {
+        setData('ticket_types', {
+            ...data.ticket_types,
+            [seatId]: value,
+        });
     }
 
     function submit() {
@@ -121,7 +180,7 @@ export default function Show({ screening, seats, takenSeatIds }: Props) {
                 title={`${screening.film.title} — ${formatStart(screening.starts_at)}`}
             />
 
-            <div className="min-h-screen bg-neutral-950 text-neutral-100">
+            <div className="min-h-screen bg-[#0a0a0b] text-neutral-100">
                 <SiteHeader maxWidth="max-w-5xl" />
 
                 <div className="mx-auto max-w-5xl px-6 py-12">
@@ -158,10 +217,21 @@ export default function Show({ screening, seats, takenSeatIds }: Props) {
                             <div
                                 className="mx-auto grid w-max gap-1.5"
                                 style={{
-                                    gridTemplateColumns: `repeat(${columns}, 1.75rem)`,
+                                    gridTemplateColumns: `1.5rem repeat(${columns}, 1.75rem)`,
                                     gridTemplateRows: `repeat(${rows}, 1.75rem)`,
                                 }}
                             >
+                                {[...rowLabels.entries()].map(([y, label]) => (
+                                    <span
+                                        key={`row-${y}`}
+                                        aria-hidden="true"
+                                        style={{ gridColumn: 1, gridRow: y }}
+                                        className="flex items-center justify-center text-[0.65rem] text-neutral-600"
+                                    >
+                                        {label}
+                                    </span>
+                                ))}
+
                                 {seats.map((seat) => {
                                     const isTaken = taken.has(seat.id);
                                     const isSelected = selected.includes(
@@ -185,7 +255,7 @@ export default function Show({ screening, seats, takenSeatIds }: Props) {
                                             }`}
                                             title={`${seat.row_label}${seat.seat_number}`}
                                             style={{
-                                                gridColumn: seat.position_x,
+                                                gridColumn: seat.position_x + 1,
                                                 gridRow: seat.position_y,
                                             }}
                                             className={[
@@ -239,6 +309,59 @@ export default function Show({ screening, seats, takenSeatIds }: Props) {
                     </div>
 
                     <div className="sticky bottom-0 -mx-6 border-t border-neutral-800 bg-neutral-950/95 px-6 py-4 backdrop-blur">
+                        {selectedSeats.length > 0 && (
+                            <ul className="mb-4 flex max-h-32 flex-wrap gap-2 overflow-y-auto">
+                                {selectedSeats.map((seat) => (
+                                    <li
+                                        key={seat.id}
+                                        className="flex items-center gap-2 rounded-md border border-neutral-800 py-1.5 pr-2 pl-3 text-sm"
+                                    >
+                                        <span className="font-medium tabular-nums">
+                                            {seat.row_label}
+                                            {seat.seat_number}
+                                        </span>
+
+                                        <label
+                                            className="sr-only"
+                                            htmlFor={`ticket-${seat.id}`}
+                                        >
+                                            Ticket type for seat{' '}
+                                            {seat.row_label}
+                                            {seat.seat_number}
+                                        </label>
+                                        <select
+                                            id={`ticket-${seat.id}`}
+                                            value={
+                                                data.ticket_types[seat.id] ??
+                                                DEFAULT_TICKET_TYPE
+                                            }
+                                            onChange={(event) =>
+                                                setTicketType(
+                                                    seat.id,
+                                                    event.target.value,
+                                                )
+                                            }
+                                            className="rounded bg-white/5 px-2 py-1 text-xs text-neutral-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                                        >
+                                            {ticketTypes.map((type) => (
+                                                <option
+                                                    key={type.value}
+                                                    value={type.value}
+                                                    className="bg-neutral-900"
+                                                >
+                                                    {type.label}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        <span className="text-xs text-neutral-500 tabular-nums">
+                                            {formatPence(priceFor(seat))}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+
                         <div className="flex flex-wrap items-center justify-between gap-4">
                             <div className="text-sm">
                                 {selectedSeats.length === 0 ? (
@@ -246,20 +369,12 @@ export default function Show({ screening, seats, takenSeatIds }: Props) {
                                         Choose your seats to continue.
                                     </p>
                                 ) : (
-                                    <p>
-                                        <span className="text-neutral-400">
-                                            {selectedSeats.length}{' '}
-                                            {selectedSeats.length === 1
-                                                ? 'seat'
-                                                : 'seats'}
-                                            :{' '}
-                                        </span>
-                                        {selectedSeats
-                                            .map(
-                                                (seat) =>
-                                                    `${seat.row_label}${seat.seat_number}`,
-                                            )
-                                            .join(', ')}
+                                    <p className="text-neutral-400">
+                                        {selectedSeats.length}{' '}
+                                        {selectedSeats.length === 1
+                                            ? 'seat'
+                                            : 'seats'}{' '}
+                                        selected
                                     </p>
                                 )}
                                 {atLimit && (
