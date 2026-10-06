@@ -26,7 +26,13 @@ class ScreenSeeder extends Seeder
     public function run(): void
     {
         foreach (self::LAYOUTS as $layout) {
-            $screen = Screen::create(['name' => $layout['name']]);
+            $screen = Screen::firstOrCreate(['name' => $layout['name']]);
+
+            // Skip screens that already have their seats, so the seeder can be
+            // re-run safely — including against production.
+            if ($screen->seats()->exists()) {
+                continue;
+            }
 
             $this->buildSeats($screen, $layout);
         }

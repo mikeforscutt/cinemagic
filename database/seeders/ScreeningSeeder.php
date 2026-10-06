@@ -28,8 +28,6 @@ class ScreeningSeeder extends Seeder
             return;
         }
 
-        $rows = [];
-
         foreach (range(0, self::DAYS_AHEAD - 1) as $dayOffset) {
             $day = Carbon::today()->addDays($dayOffset);
 
@@ -44,20 +42,20 @@ class ScreeningSeeder extends Seeder
                         continue;
                     }
 
-                    $rows[] = [
-                        'film_id' => $film->id,
-                        'screen_id' => $screen->id,
-                        'starts_at' => $startsAt,
-                        'base_price_pence' => $this->priceFor($startsAt),
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
+                    // Matches the unique constraint on (screen_id, starts_at),
+                    // so re-running the seeder adds nothing it already has.
+                    Screening::firstOrCreate(
+                        [
+                            'screen_id' => $screen->id,
+                            'starts_at' => $startsAt,
+                        ],
+                        [
+                            'film_id' => $film->id,
+                            'base_price_pence' => $this->priceFor($startsAt),
+                        ],
+                    );
                 }
             }
-        }
-
-        foreach (array_chunk($rows, 200) as $chunk) {
-            Screening::insert($chunk);
         }
     }
 
