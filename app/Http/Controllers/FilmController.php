@@ -54,12 +54,14 @@ class FilmController extends Controller
      */
     private function mostPopular(int $limit = 6): Collection
     {
+        $recentConfirmed = fn (Builder $query) => $query
+            ->where('bookings.status', BookingStatus::Confirmed->value)
+            ->where('bookings.created_at', '>', now()->subDays(30));
+
         return Film::query()
             ->whereHas('screenings', fn (Builder $query) => $query->where('starts_at', '>', now()))
-            ->withCount(['bookings as bookings_count' => fn (Builder $query) => $query
-                ->where('bookings.status', BookingStatus::Confirmed->value)
-                ->where('bookings.created_at', '>', now()->subDays(30)),
-            ])
+            ->whereHas('bookings', $recentConfirmed)
+            ->withCount(['bookings as bookings_count' => $recentConfirmed])
             ->orderByDesc('bookings_count')
             ->take($limit)
             ->get();
