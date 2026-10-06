@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\BookingStatus;
+use App\Enums\TicketType;
 use App\Exceptions\SeatUnavailableException;
 use App\Models\Booking;
 use App\Models\BookingSeat;
@@ -33,6 +34,25 @@ it('holds seats for a user', function () {
     expect($booking->status)->toBe(BookingStatus::Held)
         ->and($booking->seats)->toHaveCount(3)
         ->and($booking->held_until)->toBeGreaterThan(now());
+});
+
+it('prices each seat by its own ticket type', function () {
+    $user = User::factory()->create();
+    $screening = Screening::factory()->create(['base_price_pence' => 1000]);
+
+    $adult = Seat::factory()->for($screening->screen)->create();
+    $child = Seat::factory()->for($screening->screen)->create();
+
+    $booking = app(SeatBookingService::class)->hold(
+        $screening,
+        $user,
+        [$adult->id, $child->id],
+        [$child->id => TicketType::Child],
+    );
+
+    expect($booking->total_pence)->toBe(1600)
+        ->and($booking->seats->firstWhere('seat_id', $child->id)->price_pence)->toBe(600)
+        ->and($booking->seats->firstWhere('seat_id', $adult->id)->price_pence)->toBe(1000);
 });
 
 it('refuses a seat already held by someone else', function () {

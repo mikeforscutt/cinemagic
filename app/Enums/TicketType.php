@@ -21,4 +21,14 @@ enum TicketType: string
             self::Senior => 0.7,
         };
     }
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::Adult => 'Adult',
+            self::Child => 'Child',
+            self::Student => 'Student',
+            self::Senior => 'Senior',
+        };
+    }
 }
