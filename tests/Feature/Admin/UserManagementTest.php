@@ -168,7 +168,7 @@ it('sends an admin to the admin area after login', function () {
     $this->post('/login', [
         'email' => $admin->email,
         'password' => 'password',
-    ])->assertRedirect('/admin/users');
+    ])->assertRedirect('/admin');
 });
 
 it('sends a customer to their bookings after login', function () {
