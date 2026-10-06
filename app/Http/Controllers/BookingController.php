@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\TicketType;
 use App\Exceptions\SeatUnavailableException;
 use App\Http\Requests\HoldSeatsRequest;
 use App\Models\Booking;
@@ -60,16 +59,12 @@ class BookingController extends Controller
      */
     public function hold(HoldSeatsRequest $request, Screening $screening): RedirectResponse
     {
-        $ticketType = TicketType::from(
-            $request->validated('ticket_type') ?? TicketType::Adult->value
-        );
-
         try {
             $booking = $this->bookings->hold(
                 $screening,
                 $request->user(),
                 $request->validated('seat_ids'),
-                $ticketType,
+                $request->ticketTypes(),
             );
         } catch (SeatUnavailableException $e) {
             return back()->withErrors(['seat_ids' => $e->getMessage()]);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TicketType;
 use App\Models\Screening;
 use App\Models\Seat;
 use App\Services\SeatBookingService;
@@ -59,6 +60,11 @@ class ScreeningController extends Controller
                     'type' => $seat->type->value,
                     'price_pence' => $screening->base_price_pence + $seat->type->surchargePence(),
                 ]),
+            'ticketTypes' => collect(TicketType::cases())->map(fn (TicketType $type): array => [
+                'value' => $type->value,
+                'label' => $type->label(),
+                'multiplier' => $type->multiplier(),
+            ]),
             'takenSeatIds' => $this->bookings->takenSeatIds($screening),
         ]);
 

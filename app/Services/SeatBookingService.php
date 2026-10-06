@@ -25,16 +25,24 @@ class SeatBookingService
     /**
      * Place a temporary hold on the given seats for a screening.
      *
+     * Ticket types are per seat, so one booking can mix adult, child and
+     * concession tickets. Any seat without an entry is priced as an adult.
+     *
      * @param  array<int, int>  $seatIds
+     * @param  array<int, TicketType>  $ticketTypes  keyed by seat id
      *
      * @throws SeatUnavailableException
      */
-    public function hold(Screening $screening, User $user, array $seatIds, TicketType $ticketType = TicketType::Adult): Booking
-    {
+    public function hold(
+        Screening $screening,
+        User $user,
+        array $seatIds,
+        array $ticketTypes = [],
+    ): Booking {
         $seatIds = array_values(array_unique($seatIds));
 
         try {
-            return DB::transaction(function () use ($screening, $user, $seatIds, $ticketType): Booking {
+            return DB::transaction(function () use ($screening, $user, $seatIds, $ticketTypes): Booking {
                 $this->releaseExpiredHolds($screening);
 
                 $seats = $this->validSeatsForScreening($screening, $seatIds);
@@ -52,27 +60,31 @@ class SeatBookingService
                     throw SeatUnavailableException::taken();
                 }
 
-                $prices = $seats->mapWithKeys(
-                    fn (Seat $seat) => [$seat->id => $this->priceFor($screening, $seat, $ticketType)]
-                );
+                $lines = $seats->map(fn (Seat $seat): array => [
+                    'seat' => $seat,
+                    'ticket_type' => $ticketTypes[$seat->id] ?? TicketType::Adult,
+                ])->map(fn (array $line): array => [
+                    ...$line,
+                    'price_pence' => $this->priceFor($screening, $line['seat'], $line['ticket_type']),
+                ]);
 
                 $booking = Booking::create([
                     'user_id' => $user->id,
                     'screening_id' => $screening->id,
                     'reference' => $this->generateReference(),
                     'status' => BookingStatus::Held,
-                    'total_pence' => $prices->sum(),
+                    'total_pence' => $lines->sum('price_pence'),
                     'held_until' => now()->addMinutes(self::HOLD_MINUTES),
                     'confirmed_at' => null,
                 ]);
 
-                foreach ($seats as $seat) {
+                foreach ($lines as $line) {
                     BookingSeat::create([
                         'booking_id' => $booking->id,
                         'screening_id' => $screening->id,
-                        'seat_id' => $seat->id,
-                        'ticket_type' => $ticketType,
-                        'price_pence' => $prices[$seat->id],
+                        'seat_id' => $line['seat']->id,
+                        'ticket_type' => $line['ticket_type'],
+                        'price_pence' => $line['price_pence'],
                     ]);
                 }
 
@@ -201,6 +213,11 @@ class SeatBookingService
         return $seats;
     }
 
+    /**
+     * The seat type surcharge applies first, then the ticket type multiplier.
+     * A child ticket in a premium seat is therefore a proportion of the premium
+     * price rather than of the base price plus the full surcharge.
+     */
     private function priceFor(Screening $screening, Seat $seat, TicketType $ticketType): int
     {
         $base = $screening->base_price_pence + $seat->type->surchargePence();
