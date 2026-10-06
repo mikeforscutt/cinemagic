@@ -60,6 +60,7 @@ class FilmController extends Controller
                 ->where('bookings.status', BookingStatus::Confirmed->value)
                 ->where('bookings.created_at', '>', now()->subDays(30)),
             ])
+            ->having('bookings_count', '>', 0)
             ->orderByDesc('bookings_count')
             ->take($limit)
             ->get();
