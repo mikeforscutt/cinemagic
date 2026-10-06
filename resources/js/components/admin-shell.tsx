@@ -11,7 +11,10 @@ interface AuthUser {
     name: string;
 }
 
-const NAV = [{ label: 'Users', href: '/admin/users' }];
+const NAV = [
+    { label: 'Dashboard', href: '/admin', exact: true },
+    { label: 'Users', href: '/admin/users' },
+];
 
 export default function AdminShell({
     title,
@@ -33,7 +36,7 @@ export default function AdminShell({
                 <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
                     <div className="flex items-center gap-8">
                         <Link
-                            href="/admin/users"
+                            href="/admin/"
                             className="text-sm font-semibold tracking-tight"
                         >
                             Cinemagic
@@ -43,19 +46,25 @@ export default function AdminShell({
                         </Link>
 
                         <nav className="flex items-center gap-5 text-sm">
-                            {NAV.map((item) => (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className={
-                                        currentPath.startsWith(item.href)
-                                            ? 'text-neutral-100'
-                                            : 'text-neutral-500 transition-colors hover:text-neutral-300'
-                                    }
-                                >
-                                    {item.label}
-                                </Link>
-                            ))}
+                            {NAV.map((item) => {
+                                const active = item.exact
+                                    ? currentPath === item.href
+                                    : currentPath.startsWith(item.href);
+
+                                return (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        className={
+                                            active
+                                                ? 'text-neutral-100'
+                                                : 'text-neutral-500 transition-colors hover:text-neutral-300'
+                                        }
+                                    >
+                                        {item.label}
+                                    </Link>
+                                );
+                            })}
                         </nav>
                     </div>
 

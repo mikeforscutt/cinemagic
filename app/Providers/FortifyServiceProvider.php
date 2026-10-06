@@ -49,7 +49,7 @@ class FortifyServiceProvider extends ServiceProvider
             {
                 return redirect()->intended(
                     $request->user()?->role?->canAccessAdminArea()
-                        ? '/admin/users'
+                        ? '/admin'
                         : '/bookings'
                 );
             }
