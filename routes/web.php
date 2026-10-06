@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\FilmController;
 use App\Http\Controllers\ScreeningController;
@@ -19,5 +20,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirm'])->name('bookings.confirm');
     Route::delete('/bookings/{booking}', [BookingController::class, 'cancel'])->name('bookings.cancel');
 });
+
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::resource('users', AdminUserController::class)->except(['show']);
+    });
 
 require __DIR__.'/settings.php';

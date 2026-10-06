@@ -14,6 +14,7 @@ void createInertiaApp({
         switch (true) {
             // Public and booking pages render their own header.
             case name === 'home':
+            case name.startsWith('admin/'):
             case name.startsWith('films/'):
             case name.startsWith('screenings/'):
             case name.startsWith('bookings/'):
