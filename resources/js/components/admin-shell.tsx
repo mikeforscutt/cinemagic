@@ -13,6 +13,7 @@ interface AuthUser {
 
 const NAV = [
     { label: 'Dashboard', href: '/admin', exact: true },
+    { label: 'Films', href: '/admin/films' },
     { label: 'Users', href: '/admin/users' },
 ];
 
