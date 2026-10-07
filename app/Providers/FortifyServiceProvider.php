@@ -11,8 +11,10 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
+use Laravel\Fortify\Contracts\LoginResponse;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
+use Symfony\Component\HttpFoundation\Response;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -21,7 +23,7 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->configureLoginRedirect();
     }
 
     /**
@@ -32,6 +34,26 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureActions();
         $this->configureViews();
         $this->configureRateLimiting();
+    }
+
+    /**
+     * Fortify's home config is a single path for everyone, so admins and staff
+     * are sent to the admin area instead of their own bookings. An intended
+     * URL still wins, so being bounced to login from a page returns you there.
+     */
+    private function configureLoginRedirect(): void
+    {
+        $this->app->instance(LoginResponse::class, new class implements LoginResponse
+        {
+            public function toResponse($request): Response
+            {
+                return redirect()->intended(
+                    $request->user()?->role?->canAccessAdminArea()
+                        ? '/admin'
+                        : '/bookings'
+                );
+            }
+        });
     }
 
     /**
