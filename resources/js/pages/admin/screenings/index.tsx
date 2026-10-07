@@ -22,6 +22,7 @@ interface Props {
         data: ScreeningRow[];
         links: PaginationLink[];
     };
+    canManage: boolean;
 }
 
 const TIMEZONE = 'Europe/London';
@@ -51,7 +52,7 @@ function cleanLabel(label: string): string {
     return label.replace('&laquo;', '‹').replace('&raquo;', '›');
 }
 
-export default function Index({ screenings }: Props) {
+export default function Index({ screenings, canManage }: Props) {
     function destroy(screening: ScreeningRow) {
         const when = `${formatDate(screening.starts_at)} at ${formatTime(screening.starts_at)}`;
 
@@ -72,19 +73,25 @@ export default function Index({ screenings }: Props) {
 
             <AdminShell
                 title="Screenings"
-                description="Everything scheduled from today onwards, soonest first."
+                description={
+                    canManage
+                        ? 'Everything scheduled from today onwards, soonest first.'
+                        : 'Everything scheduled from today onwards. Scheduling is admin only.'
+                }
                 actions={
-                    <Link
-                        href="/admin/screenings/create"
-                        className="rounded-md bg-amber-400 px-4 py-2 text-sm font-medium text-neutral-900 transition-colors hover:bg-amber-300"
-                    >
-                        Schedule screening
-                    </Link>
+                    canManage ? (
+                        <Link
+                            href="/admin/screenings/create"
+                            className="rounded-md bg-amber-400 px-4 py-2 text-sm font-medium text-neutral-900 transition-colors hover:bg-amber-300"
+                        >
+                            Schedule screening
+                        </Link>
+                    ) : null
                 }
             >
                 {screenings.data.length === 0 ? (
                     <p className="rounded-lg border border-neutral-900 px-6 py-12 text-center text-sm text-neutral-500">
-                        Nothing scheduled. Add the first screening.
+                        Nothing scheduled.
                     </p>
                 ) : (
                     <div className="overflow-hidden rounded-lg border border-neutral-900">
@@ -106,7 +113,7 @@ export default function Index({ screenings }: Props) {
                                     <th className="px-4 py-3 font-medium">
                                         Bookings
                                     </th>
-                                    <th className="px-4 py-3" />
+                                    {canManage && <th className="px-4 py-3" />}
                                 </tr>
                             </thead>
                             <tbody>
@@ -148,46 +155,48 @@ export default function Index({ screenings }: Props) {
                                             <td className="px-4 py-3 text-neutral-400">
                                                 {screening.bookings_count}
                                             </td>
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center justify-end gap-4">
-                                                    {booked ? (
-                                                        <span
-                                                            title="People have booked this screening"
-                                                            className="cursor-not-allowed text-neutral-700"
-                                                        >
-                                                            Edit
-                                                        </span>
-                                                    ) : (
-                                                        <Link
-                                                            href={`/admin/screenings/${screening.id}/edit`}
-                                                            className="text-amber-400 transition-colors hover:text-amber-300"
-                                                        >
-                                                            Edit
-                                                        </Link>
-                                                    )}
+                                            {canManage && (
+                                                <td className="px-4 py-3">
+                                                    <div className="flex items-center justify-end gap-4">
+                                                        {booked ? (
+                                                            <span
+                                                                title="People have booked this screening"
+                                                                className="cursor-not-allowed text-neutral-700"
+                                                            >
+                                                                Edit
+                                                            </span>
+                                                        ) : (
+                                                            <Link
+                                                                href={`/admin/screenings/${screening.id}/edit`}
+                                                                className="text-amber-400 transition-colors hover:text-amber-300"
+                                                            >
+                                                                Edit
+                                                            </Link>
+                                                        )}
 
-                                                    {booked ? (
-                                                        <span
-                                                            title="People have booked this screening"
-                                                            className="cursor-not-allowed text-neutral-700"
-                                                        >
-                                                            Remove
-                                                        </span>
-                                                    ) : (
-                                                        <button
-                                                            type="button"
-                                                            onClick={() =>
-                                                                destroy(
-                                                                    screening,
-                                                                )
-                                                            }
-                                                            className="text-red-400 transition-colors hover:text-red-300"
-                                                        >
-                                                            Remove
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </td>
+                                                        {booked ? (
+                                                            <span
+                                                                title="People have booked this screening"
+                                                                className="cursor-not-allowed text-neutral-700"
+                                                            >
+                                                                Remove
+                                                            </span>
+                                                        ) : (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    destroy(
+                                                                        screening,
+                                                                    )
+                                                                }
+                                                                className="text-red-400 transition-colors hover:text-red-300"
+                                                            >
+                                                                Remove
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            )}
                                         </tr>
                                     );
                                 })}

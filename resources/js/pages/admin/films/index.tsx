@@ -23,6 +23,7 @@ interface Props {
         data: FilmRow[];
         links: PaginationLink[];
     };
+    canManage: boolean;
 }
 
 function formatDate(value: string | null): string {
@@ -41,7 +42,7 @@ function cleanLabel(label: string): string {
     return label.replace('&laquo;', '‹').replace('&raquo;', '›');
 }
 
-export default function Index({ films }: Props) {
+export default function Index({ films, canManage }: Props) {
     function destroy(film: FilmRow) {
         if (window.confirm(`Delete “${film.title}”? This cannot be undone.`)) {
             router.delete(`/admin/films/${film.id}`, {
@@ -56,19 +57,25 @@ export default function Index({ films }: Props) {
 
             <AdminShell
                 title="Films"
-                description="Everything in the catalogue, newest first."
+                description={
+                    canManage
+                        ? 'Everything in the catalogue, newest first.'
+                        : 'Everything in the catalogue, newest first. Editing is admin only.'
+                }
                 actions={
-                    <Link
-                        href="/admin/films/create"
-                        className="rounded-md bg-amber-400 px-4 py-2 text-sm font-medium text-neutral-900 transition-colors hover:bg-amber-300"
-                    >
-                        Add film
-                    </Link>
+                    canManage ? (
+                        <Link
+                            href="/admin/films/create"
+                            className="rounded-md bg-amber-400 px-4 py-2 text-sm font-medium text-neutral-900 transition-colors hover:bg-amber-300"
+                        >
+                            Add film
+                        </Link>
+                    ) : null
                 }
             >
                 {films.data.length === 0 ? (
                     <p className="rounded-lg border border-neutral-900 px-6 py-12 text-center text-sm text-neutral-500">
-                        No films yet. Add the first one.
+                        No films yet.
                     </p>
                 ) : (
                     <div className="overflow-hidden rounded-lg border border-neutral-900">
@@ -90,7 +97,7 @@ export default function Index({ films }: Props) {
                                     <th className="px-4 py-3 font-medium">
                                         Screenings
                                     </th>
-                                    <th className="px-4 py-3" />
+                                    {canManage && <th className="px-4 py-3" />}
                                 </tr>
                             </thead>
                             <tbody>
@@ -128,35 +135,38 @@ export default function Index({ films }: Props) {
                                         <td className="px-4 py-3 text-neutral-400">
                                             {film.screenings_count}
                                         </td>
-                                        <td className="px-4 py-3">
-                                            <div className="flex items-center justify-end gap-4">
-                                                <Link
-                                                    href={`/admin/films/${film.id}/edit`}
-                                                    className="text-amber-400 transition-colors hover:text-amber-300"
-                                                >
-                                                    Edit
-                                                </Link>
+                                        {canManage && (
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center justify-end gap-4">
+                                                    <Link
+                                                        href={`/admin/films/${film.id}/edit`}
+                                                        className="text-amber-400 transition-colors hover:text-amber-300"
+                                                    >
+                                                        Edit
+                                                    </Link>
 
-                                                {film.screenings_count > 0 ? (
-                                                    <span
-                                                        title="Remove its screenings first"
-                                                        className="cursor-not-allowed text-neutral-700"
-                                                    >
-                                                        Delete
-                                                    </span>
-                                                ) : (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() =>
-                                                            destroy(film)
-                                                        }
-                                                        className="text-red-400 transition-colors hover:text-red-300"
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </td>
+                                                    {film.screenings_count >
+                                                    0 ? (
+                                                        <span
+                                                            title="Remove its screenings first"
+                                                            className="cursor-not-allowed text-neutral-700"
+                                                        >
+                                                            Delete
+                                                        </span>
+                                                    ) : (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                destroy(film)
+                                                            }
+                                                            className="text-red-400 transition-colors hover:text-red-300"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))}
                             </tbody>
