@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -40,6 +41,13 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
+                // Shared so the admin nav can hide what the viewer cannot
+                // reach, asking the same policies the controllers enforce
+                // rather than keeping a second copy of the rules in React.
+                'can' => [
+                    'manageUsers' => $request->user()
+                        ?->can('viewAny', User::class) ?? false,
+                ],
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

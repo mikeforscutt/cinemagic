@@ -37,6 +37,7 @@ final class FilmController extends Controller
 
         return Inertia::render('admin/films/index', [
             'films' => $films,
+            'canManage' => Gate::allows('create', Film::class),
         ]);
     }
 

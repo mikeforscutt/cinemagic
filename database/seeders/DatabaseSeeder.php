@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->demoUser('demo@cinemagic.test', 'Demo User', UserRole::Customer);
         $this->demoUser('admin@cinemagic.test', 'Admin User', UserRole::Admin);
+        $this->demoUser('staff@cinemagic.test', 'Staff User', UserRole::Staff);
 
         $this->call([
             ScreenSeeder::class,

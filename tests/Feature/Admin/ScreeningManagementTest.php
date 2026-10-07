@@ -184,3 +184,21 @@ it('stops staff opening the scheduling form', function (): void {
         ->get(route('admin.screenings.create'))
         ->assertForbidden();
 });
+
+it('stops staff deleting a screening', function (): void {
+    $screening = Screening::factory()->create();
+
+    $this->actingAs(User::factory()->create(['role' => UserRole::Staff]))
+        ->delete(route('admin.screenings.destroy', $screening))
+        ->assertForbidden();
+
+    expect(Screening::count())->toBe(1);
+});
+
+it('stops staff editing a screening', function (): void {
+    $screening = Screening::factory()->create();
+
+    $this->actingAs(User::factory()->create(['role' => UserRole::Staff]))
+        ->get(route('admin.screenings.edit', $screening))
+        ->assertForbidden();
+});
