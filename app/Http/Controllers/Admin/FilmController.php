@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\FilmCertificate;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreFilmRequest;
 use App\Http\Requests\Admin\UpdateFilmRequest;
@@ -27,7 +28,7 @@ final class FilmController extends Controller
                 'id' => $film->id,
                 'title' => $film->title,
                 'slug' => $film->slug,
-                'certificate' => $film->certificate,
+                'certificate' => $film->certificate->value,
                 'runtime_minutes' => $film->runtime_minutes,
                 'release_date' => $film->release_date?->toDateString(),
                 'screenings_count' => $film->screenings_count,
@@ -43,7 +44,9 @@ final class FilmController extends Controller
     {
         Gate::authorize('create', Film::class);
 
-        return Inertia::render('admin/films/create');
+        return Inertia::render('admin/films/create', [
+            'certificates' => FilmCertificate::options(),
+        ]);
     }
 
     public function store(StoreFilmRequest $request): RedirectResponse
@@ -66,13 +69,14 @@ final class FilmController extends Controller
                 'title' => $film->title,
                 'synopsis' => $film->synopsis,
                 'runtime_minutes' => $film->runtime_minutes,
-                'certificate' => $film->certificate,
+                'certificate' => $film->certificate->value,
                 'release_date' => $film->release_date?->toDateString(),
                 'director' => $film->director,
                 'genres' => $film->genres,
                 'cast_list' => $film->cast_list,
                 'poster_path' => $film->poster_path,
             ],
+            'certificates' => FilmCertificate::options(),
             'screeningsCount' => $film->screenings()->count(),
         ]);
     }

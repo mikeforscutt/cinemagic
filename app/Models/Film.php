@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\FilmCertificate;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -45,6 +46,7 @@ class Film extends Model
             'genres' => 'array',
             'cast_list' => 'array',
             'runtime_minutes' => 'integer',
+            'certificate' => FilmCertificate::class,
         ];
     }
 
