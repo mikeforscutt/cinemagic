@@ -10,9 +10,9 @@ class FilmPolicy
     /**
      * Films are public, so anyone can browse them.
      */
-    public function viewAny(?User $user): bool
+    public function viewAny(User $user): bool
     {
-        return true;
+        return $user->role->canAccessAdminArea();
     }
 
     public function view(?User $user, Film $film): bool
