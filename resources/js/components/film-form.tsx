@@ -13,17 +13,21 @@ export interface FilmFormData {
     poster_path: string;
 }
 
+export interface CertificateOption {
+    value: string;
+    label: string;
+}
+
 interface Props {
     data: FilmFormData;
     errors: Partial<Record<string, string>>;
     processing: boolean;
+    certificates: CertificateOption[];
     onChange: (field: keyof FilmFormData, value: string) => void;
     onSubmit: (event: FormEvent) => void;
     submitLabel: string;
     busyLabel: string;
 }
-
-const CERTIFICATES = ['U', 'PG', '12A', '12', '15', '18'];
 
 const field =
     'mt-1.5 w-full rounded-md border border-neutral-800 bg-transparent px-3 py-2 text-sm focus:border-neutral-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400';
@@ -42,6 +46,7 @@ export default function FilmForm({
     data,
     errors,
     processing,
+    certificates,
     onChange,
     onSubmit,
     submitLabel,
@@ -114,13 +119,13 @@ export default function FilmForm({
                         }
                         className={field}
                     >
-                        {CERTIFICATES.map((certificate) => (
+                        {certificates.map((option) => (
                             <option
-                                key={certificate}
-                                value={certificate}
+                                key={option.value}
+                                value={option.value}
                                 className="bg-neutral-900"
                             >
-                                {certificate}
+                                {option.label}
                             </option>
                         ))}
                     </select>

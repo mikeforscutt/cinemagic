@@ -1,7 +1,14 @@
 import { Head, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import AdminShell from '@/components/admin-shell';
-import FilmForm, { type FilmFormData } from '@/components/film-form';
+import FilmForm, {
+    type CertificateOption,
+    type FilmFormData,
+} from '@/components/film-form';
+
+interface Props {
+    certificates: CertificateOption[];
+}
 
 function toList(value: string): string[] {
     return value
@@ -10,13 +17,13 @@ function toList(value: string): string[] {
         .filter((item) => item.length > 0);
 }
 
-export default function Create() {
+export default function Create({ certificates }: Props) {
     const { data, setData, post, transform, processing, errors } =
         useForm<FilmFormData>({
             title: '',
             synopsis: '',
             runtime_minutes: '',
-            certificate: '15',
+            certificate: certificates[0]?.value ?? '',
             release_date: '',
             director: '',
             genres: '',
@@ -49,6 +56,7 @@ export default function Create() {
                     data={data}
                     errors={errors}
                     processing={processing}
+                    certificates={certificates}
                     onChange={(fieldName, value) => setData(fieldName, value)}
                     onSubmit={submit}
                     submitLabel="Add film"

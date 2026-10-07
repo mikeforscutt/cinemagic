@@ -1,7 +1,10 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import AdminShell from '@/components/admin-shell';
-import FilmForm, { type FilmFormData } from '@/components/film-form';
+import FilmForm, {
+    type CertificateOption,
+    type FilmFormData,
+} from '@/components/film-form';
 
 interface Film {
     id: number;
@@ -18,6 +21,7 @@ interface Film {
 
 interface Props {
     film: Film;
+    certificates: CertificateOption[];
     screeningsCount: number;
 }
 
@@ -28,7 +32,7 @@ function toList(value: string): string[] {
         .filter((item) => item.length > 0);
 }
 
-export default function Edit({ film, screeningsCount }: Props) {
+export default function Edit({ film, certificates, screeningsCount }: Props) {
     const { data, setData, put, transform, processing, errors } =
         useForm<FilmFormData>({
             title: film.title,
@@ -95,6 +99,7 @@ export default function Edit({ film, screeningsCount }: Props) {
                     data={data}
                     errors={errors}
                     processing={processing}
+                    certificates={certificates}
                     onChange={(fieldName, value) => setData(fieldName, value)}
                     onSubmit={submit}
                     submitLabel="Save changes"
