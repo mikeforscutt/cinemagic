@@ -11,11 +11,20 @@ interface AuthUser {
     name: string;
 }
 
-const NAV = [
+type Permission = 'manageUsers';
+
+interface NavItem {
+    label: string;
+    href: string;
+    exact?: boolean;
+    permission?: Permission;
+}
+
+const NAV: NavItem[] = [
     { label: 'Dashboard', href: '/admin', exact: true },
     { label: 'Films', href: '/admin/films' },
     { label: 'Screenings', href: '/admin/screenings' },
-    { label: 'Users', href: '/admin/users' },
+    { label: 'Users', href: '/admin/users', permission: 'manageUsers' },
 ];
 
 export default function AdminShell({
@@ -25,12 +34,19 @@ export default function AdminShell({
     children,
 }: PropsWithChildren<Props>) {
     const { auth, url } = usePage().props as unknown as {
-        auth: { user: AuthUser | null };
+        auth: {
+            user: AuthUser | null;
+            can?: Partial<Record<Permission, boolean>>;
+        };
         url?: string;
     };
 
     const currentPath =
         url ?? (typeof window !== 'undefined' ? window.location.pathname : '');
+
+    const nav = NAV.filter(
+        (item) => !item.permission || (auth.can?.[item.permission] ?? false),
+    );
 
     return (
         <div className="min-h-screen bg-[#0a0a0b] text-neutral-100">
@@ -48,7 +64,7 @@ export default function AdminShell({
                         </Link>
 
                         <nav className="flex items-center gap-5 text-sm">
-                            {NAV.map((item) => {
+                            {nav.map((item) => {
                                 const active = item.exact
                                     ? currentPath === item.href
                                     : currentPath.startsWith(item.href);

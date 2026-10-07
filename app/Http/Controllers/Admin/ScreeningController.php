@@ -42,6 +42,9 @@ final class ScreeningController extends Controller
 
         return Inertia::render('admin/screenings/index', [
             'screenings' => $screenings,
+            // Staff read the schedule but cannot change it, so the page is
+            // told whether to offer the controls at all.
+            'canManage' => Gate::allows('create', Screening::class),
         ]);
     }
 
