@@ -172,3 +172,15 @@ it('deletes a screening with no bookings', function (): void {
 
     expect(Screening::count())->toBe(0);
 });
+
+it('shows the scheduling form to an admin', function (): void {
+    $this->actingAs(User::factory()->create(['role' => UserRole::Admin]))
+        ->get(route('admin.screenings.create'))
+        ->assertOk();
+});
+
+it('stops staff opening the scheduling form', function (): void {
+    $this->actingAs(User::factory()->create(['role' => UserRole::Staff]))
+        ->get(route('admin.screenings.create'))
+        ->assertForbidden();
+});
