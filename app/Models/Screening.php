@@ -12,6 +12,17 @@ class Screening extends Model
 {
     use HasFactory;
 
+    /**
+     * The cinema's local timezone. Times are entered and displayed in this
+     * zone and stored in UTC.
+     */
+    public const TIMEZONE = 'Europe/London';
+
+    /**
+     * Minutes a screen needs between films for cleaning and turnaround.
+     */
+    public const TURNAROUND_MINUTES = 15;
+
     protected $fillable = [
         'film_id',
         'screen_id',

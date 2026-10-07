@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FilmController as AdminFilmController;
+use App\Http\Controllers\Admin\ScreeningController as AdminScreeningController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\FilmController;
@@ -30,6 +31,7 @@ Route::middleware(['auth', 'admin'])
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::resource('users', AdminUserController::class)->except(['show']);
         Route::resource('films', AdminFilmController::class)->except(['show']);
+        Route::resource('screenings', AdminScreeningController::class)->except(['show']);
     });
 
 require __DIR__.'/settings.php';
