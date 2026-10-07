@@ -1,5 +1,5 @@
-import { Head, useForm } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
+import { Head, router, useForm } from '@inertiajs/react';
+import { useEffect, useMemo, useState } from 'react';
 import SiteHeader from '@/components/site-header';
 import Spinner from '@/components/spinner';
 
@@ -52,6 +52,9 @@ const DEFAULT_TICKET_TYPE = 'adult';
 /** Longest the staggered seat entrance is allowed to run, in ms. */
 const MAX_STAGGER_MS = 420;
 
+/** How often to re-check which seats are still free, in ms. */
+const POLL_INTERVAL_MS = 15_000;
+
 function formatPence(pence: number): string {
     return new Intl.NumberFormat('en-GB', {
         style: 'currency',
@@ -84,6 +87,7 @@ export default function Show({
     });
 
     const [shakingSeatId, setShakingSeatId] = useState<number | null>(null);
+    const [lostSeats, setLostSeats] = useState<string[]>([]);
 
     const selected = data.seat_ids;
 
@@ -124,6 +128,52 @@ export default function Show({
         () => seats.filter((seat) => selected.includes(seat.id)),
         [seats, selected],
     );
+
+    /**
+     * Someone else can take a seat while this page sits open, so availability
+     * is re-fetched on a timer. `only` asks Inertia for that single prop
+     * rather than the whole page, and the reload preserves component state so
+     * the current selection survives.
+     */
+    useEffect(() => {
+        const timer = window.setInterval(() => {
+            if (document.hidden) {
+                return;
+            }
+
+            router.reload({ only: ['takenSeatIds'] });
+        }, POLL_INTERVAL_MS);
+
+        return () => window.clearInterval(timer);
+    }, []);
+
+    /**
+     * If a poll reveals that a selected seat has gone, drop it rather than
+     * letting the hold fail on submit, and say which ones went.
+     */
+    useEffect(() => {
+        const lost = selectedSeats.filter((seat) => taken.has(seat.id));
+
+        if (lost.length === 0) {
+            return;
+        }
+
+        const lostIds = new Set(lost.map((seat) => seat.id));
+        const remainingTypes = { ...data.ticket_types };
+
+        for (const id of lostIds) {
+            delete remainingTypes[id];
+        }
+
+        setData({
+            seat_ids: selected.filter((id) => !lostIds.has(id)),
+            ticket_types: remainingTypes,
+        });
+
+        setLostSeats(
+            lost.map((seat) => `${seat.row_label}${seat.seat_number}`),
+        );
+    }, [taken, selectedSeats, selected, data.ticket_types, setData]);
 
     function priceFor(seat: Seat): number {
         const type = data.ticket_types[seat.id] ?? DEFAULT_TICKET_TYPE;
@@ -169,6 +219,8 @@ export default function Show({
 
             return;
         }
+
+        setLostSeats([]);
 
         setData({
             seat_ids: [...selected, seat.id],
@@ -221,6 +273,26 @@ export default function Show({
                             className="fade-up mb-8 rounded-md border border-red-900 bg-red-950/60 px-4 py-3 text-sm text-red-200"
                         >
                             {errors.seat_ids}
+                        </div>
+                    )}
+
+                    {lostSeats.length > 0 && (
+                        <div
+                            role="status"
+                            className="fade-up mb-8 flex items-start justify-between gap-4 rounded-md border border-amber-900/60 bg-amber-950/40 px-4 py-3 text-sm text-amber-200"
+                        >
+                            <p>
+                                {lostSeats.length === 1
+                                    ? `Seat ${lostSeats[0]} was booked by someone else, so it has been removed from your selection.`
+                                    : `Seats ${lostSeats.join(', ')} were booked by someone else, so they have been removed from your selection.`}
+                            </p>
+                            <button
+                                type="button"
+                                onClick={() => setLostSeats([])}
+                                className="shrink-0 text-amber-400 transition-colors hover:text-amber-300"
+                            >
+                                Dismiss
+                            </button>
                         </div>
                     )}
 
@@ -331,6 +403,10 @@ export default function Show({
                                 Taken
                             </li>
                         </ul>
+
+                        <p className="mt-4 text-center text-xs text-neutral-600">
+                            Availability refreshes every 15 seconds.
+                        </p>
                     </div>
 
                     <div className="sticky bottom-0 -mx-6 border-t border-neutral-800 bg-neutral-950/95 px-6 py-4 backdrop-blur">
